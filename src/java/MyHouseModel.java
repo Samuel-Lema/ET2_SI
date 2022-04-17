@@ -23,14 +23,14 @@ public class MyHouseModel extends GridWorldModel {
     int availableBeers  = 3; // how many beers are available
 	int trashCanCount = 0; // Contador de basura de la papelera
 	int trashThrowed = 0;
-	
+
 	Stack<Location> stack = new Stack<Location>();
 
     Location lFridge = new Location(0,0);
-	Location lTrashCan = new Location(GSize-1,0);
     Location lOwner  = new Location(GSize-1, GSize-1); 
     Location lDelivery  = new Location(0, GSize-1); 
 	Location lRobot = new Location(GSize/2, GSize/2);
+	Location lTrashCan = new Location(GSize-1,0);
 	Location lCan;
 	
 	Area aFridge = new Area(0,0,1,1);
@@ -38,11 +38,11 @@ public class MyHouseModel extends GridWorldModel {
 	Area aOwner = new Area(9,9,10,10);
 	
 	boolean atFridge = false;
-	boolean atTrashCan = false;
 	boolean atOwner = false;
 	boolean atDelivery = false;
-	boolean atCan = false;
 	boolean atBase = false;
+	boolean atTrashCan = false;
+	boolean atCan = false;
 
     public MyHouseModel() {
         // create a 7x7 grid with one mobile agent
@@ -53,9 +53,9 @@ public class MyHouseModel extends GridWorldModel {
 
         // initial location of fridge and owner
         add(FRIDGE, lFridge);
-		add(TRASHCAN, lTrashCan);
         add(OWNER, lOwner);
 		add(DELIVERY, lDelivery);
+		add(TRASHCAN, lTrashCan);
     }
 	
     boolean openFridge() {
@@ -85,10 +85,8 @@ public class MyHouseModel extends GridWorldModel {
 		
         setAgPos(0, r1); // move the robot in the grid
 
-		atOwner = r1.isInArea(aOwner);
-		atFridge = r1.isInArea(aFridge);
-		atTrashCan = r1.isInArea(aTrashCan);
-		atCan = r1.equals(lCan);
+		atOwner = r1.equals(closeTolOwner);
+		atFridge = r1.equals(closeTolFridge);
 		atDelivery = r1.equals(lDelivery);
 		atBase = r1.equals(lRobot);
 
@@ -143,50 +141,50 @@ public class MyHouseModel extends GridWorldModel {
         }
     }
 	
-	boolean throwBeer(){
-		
+		boolean throwBeer(){
+
 		Random r1 = new Random();
 		Random r2 = new Random();
-			
+
 		lCan  = new Location(9 - (r1.nextInt(2) + 1) , 7 - (r2.nextInt(2)+1));
 		add(CAN, lCan);
 
 		stack.push(lCan);
 		trashThrowed++;
-		
+
 		return true;
 	}
-	
+
 	boolean pickUpCan(){
-		
+
 		Location lCan = stack.pop();
-		
+
 		if(lCan != null){
-			
+
 			remove(CAN, lCan);
 			return true;
 		}
 
 		return false;
 	}
-	
+
 	boolean dropDownCan(){
-		
+
 		trashCanCount++;
 		trashThrowed--;
 		return true;
 	}
-	
+
 	boolean emptyTrashCan(){
-		
+
 		if(trashCanCount == 3){
 			trashCanCount = 0;
 		}
-			
+
 		if (view != null){
             view.update(lTrashCan.x, lTrashCan.y);
 		}
-		
+
 		 return true;
 	}
 }

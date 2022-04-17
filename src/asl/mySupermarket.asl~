@@ -13,8 +13,8 @@ hayStock(no).
 /* Plans */
 +!crearGestor : gestor(G) & .my_name(N) & dinero(D) & precio(P) & precioTransporte(T) & dir(Dir) <-
 	.println("Creando gestor.");
-	.create_agent(G,"gestor.asl"); //para usar las creencias iniciales
-	//.create_agent(G,Dir); //para usar persistencia
+	//.create_agent(G,"gestor.asl"); //para usar las creencias iniciales
+	.create_agent(G,Dir); //para usar persistencia
 	.abolish(dinero(_));
 	.abolish(precio(_));
 	.abolish(precioTransporte(_));
