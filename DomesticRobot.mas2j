@@ -10,17 +10,13 @@ MAS domestic_robot {
     agents: myOwner
 				agentArchClass MixedAgentArch
 				agentArchClass jaca.CAgentArch;
-			myRobot
+			myRobot //myRobotSaved.asl
 				agentArchClass MixedAgentArch
 				agentArchClass jaca.CAgentArch;
-			myRoomba
-				agentArchClass MixedAgentArch
-				agentArchClass jaca.CAgentArch;
-            super1	mySupermarket.asl [beliefs="gestor(gestor1), precio(120), dinero(500), default_bid_value(90)"];
-            super2	mySupermarket.asl [beliefs="gestor(gestor2), precio(100), dinero(400), default_bid_value(90)"];
-			super3	mySupermarket.asl [beliefs="gestor(gestor3), precio(150), dinero(260), default_bid_value(100)"];
+            super1	mySupermarket.asl [beliefs="gestor(gestor1), precio(120), dinero(500), default_bid_value(80), precioTransporte(20), tiempoEntrega(8000), dir(\"./src/asl/gestor1Saved.asl\")"];
+            super2	mySupermarket.asl [beliefs="gestor(gestor2), precio(100), dinero(400), default_bid_value(90), precioTransporte(50), tiempoEntrega(5000), dir(\"./src/asl/gestor2Saved.asl\")"];
+			super3	mySupermarket.asl [beliefs="gestor(gestor3), precio(150), dinero(260), default_bid_value(100), precioTransporte(80), tiempoEntrega(2000), dir(\"./src/asl/gestor3Saved.asl\")"];
 			auctioneer agentArchClass AuctioneerGUI;
-
 			
 	aslSourcePath: "src/asl";	
 }                         

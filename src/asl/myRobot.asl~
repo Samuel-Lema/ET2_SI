@@ -5,7 +5,7 @@ available(beer,fridge).
 mySupermarkets(super1).
 mySupermarkets(super2).
 mySupermarkets(super3).
-dinero(1500).
+dinero(0).
 
 // my owner should not consume more than 10 beers a day :-)
 limit(beer,5).
@@ -62,11 +62,7 @@ filter(Answer, addingBot, [ToWrite,Route]):-
 
 !answerOwner.
 
-!cleanHouse.
-
 !bringBeer.
-
-//!manageBeer. Implementar
 
 /* Plans */
 
@@ -76,13 +72,21 @@ filter(Answer, addingBot, [ToWrite,Route]):-
 	+bot("bot").
 
 +!answerOwner : msg(Msg)[source(Ag)] & bot(Bot) <-
-	//bot.ownerResponses(Msg,Answer);
-	//-msg(Msg)[source(Ag)];   
-	//.println("El agente ",Ag," ha dicho ",Msg);
-	//.send(Ag,tell,answer(Answer));
+	chatSincrono(Msg,Answer);
+	//chat(Msg) // De manera asÃ­ncrona devuelve una signal => answer(Answer)
+	-msg(Msg)[source(Ag)];   
+	.println("El agente ",Ag," ha dicho ",Msg);
+	!doSomething(Answer,Ag);
+	//.send(Ag,tell,answer(Answer)); //modificar adecuadamente
 	!answerOwner.
-	
 +!answerOwner <- !answerOwner.
+
++!doSomething(Answer,Ag) : service(Answer, Service) <-
+	.println("Aqui debe ir el cÃ³digo del servicio:", Service," para el agente ",Ag).
+	
++!doSomething(Answer,Ag) : not service(Answer, Service) <-
+	.println("Le contesto al ",Ag," ",Answer);
+	.send(Ag,tell,answer(Answer)). //modificar adecuadamente
 
 +!bring(myOwner, beer) [source(myOwner)] <-
 	+asked(beer).
@@ -90,7 +94,6 @@ filter(Answer, addingBot, [ToWrite,Route]):-
 +!bringBeer : healthMsg(_) <- 
 	!go_at(myRobot,base);
 	.println("El Robot descansa porque Owner ha bebido mucho hoy.").
-	
 +!bringBeer : asked(beer) & not healthMsg(_) <- 
 	.println("Owner me ha pedido una cerveza.");
 	!go_at(myRobot,fridge);
@@ -123,17 +126,20 @@ filter(Answer, addingBot, [ToWrite,Route]):-
 	.println("El robot cierra la nevera.").
 +!check(fridge, beer) : not ordered(beer) & not available(beer,fridge) <-
 	.println("El robot estÃ¡ en el frigorÃ­fico y hace un pedido de cerveza.");
-	.abolish(hayStock(_));
-	.send(super1,askOne,hayStock(A));	//ver cuáles supermarkets tienen stock antes de elegir
-	.send(super2,askOne,hayStock(B));
-	.send(super3,askOne,hayStock(C));
-	.wait(2000);
-	!elegirSuper;
+	!comprobarStock;
 	!check(fridge, beer).
 +!check(fridge, beer) <-
 	.println("El robot estÃ¡ esperando ................");
 	.wait(5000);
 	!check(fridge, beer).
+	
++!comprobarStock <-
+	.abolish(hayStock(_));
+	.send(super1,askOne,hayStock(A));	//ver cuáles supermarkets tienen stock antes de elegir
+	.send(super2,askOne,hayStock(B));
+	.send(super3,askOne,hayStock(C));
+	.wait(2000);
+	!elegirSuper.
 	
 +!elegirSuper : not ordered(beer) & .findall(p(P,S),hayStock(P)[source(S)],L)
     //si el super tiene stock, P = precio, si no, P = "no" (los números tienen prioridad en la función .min)
@@ -150,11 +156,7 @@ filter(Answer, addingBot, [ToWrite,Route]):-
 	if (Supermarket == sinStock) {
 		.println("Ningún super tiene stock. Esperando...");
 		.wait(5000);
-		.abolish(hayStock(_));
-		.send(super1,askOne,hayStock(A));	//ver cuáles tienen stock antes de elegir
-		.send(super2,askOne,hayStock(B));
-		.send(super3,askOne,hayStock(C));
-		!elegirSuper;
+		!comprobarStock;
 	} else {
 		if (D < P) {
 			.println("No tengo dinero para comprar en ",Supermarket);
@@ -204,27 +206,13 @@ filter(Answer, addingBot, [ToWrite,Route]):-
 +stock(beer,N) :  N > 0 & not available(beer,fridge) <-
 	-+available(beer,fridge).
 
-// Cuando la basura este llena el agente myRoomba lo vacia	
-+!cleanHouse : trashcan(full) <- 
-	.send(myRoomba, tell, trashcan(full));
-	.send(myRoomba, achieve, emptyTrashcan);
-	// El untell tarda demasiado, el propio myRoomba debería dejar de creerlo
-	.send(myRoomba, untell, trashcan(full));
-	-trashcan(full);
-	!cleanHouse.
-	
-+!cleanHouse: canatfloor(can) <- 
-	!go_at(myRobot,can);
-	pickup(can);
-	.println("Se ha recogido una lata del suelo");
-	!go_at(myRobot,trashCan);
-	dropdown(can);
-	.println("Se ha tirado la lata a la basura");
-	-canatfloor(can);
-	!cleanHouse.
-	
-+!cleanHouse <- !cleanHouse.
-
 +?time(T) : true
   <-  time.check(T).
 
++dinero(X) : X<200
+  <-  .println("Solo me quedan ",X," céntimos, pidiendo al owner.");
+	  .send(myOwner, achieve, darDinero(400)).
+	  
++!recibirDinero(X) : dinero(D)
+  <-  .println("Recibidos ",X," céntimos del owner.");
+  	  -+dinero(D+X).

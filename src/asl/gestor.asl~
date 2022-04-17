@@ -11,7 +11,7 @@ available(beer).
 /* Plans */
 
 +!save : .my_name(N) & dir(Dir) <-
-	.println("Guardando en ",Dir);
+	.println("Guardando en ",N," punto asl");
 	.save_agent(Dir).
 
 +processOrderFrom(Ag, Qtd) : stock(beer,X) & supermarket(Super) & dinero(D) & precioTransporte(T) <-
@@ -26,21 +26,17 @@ available(beer).
 		-+stock(beer,0);
 	}
 	!cambiarDinero(D-T); //dinero que cuesta la entrega
-	.abolish(processOrderFrom(Ag, Qtd));
-	!save.
+	.abolish(processOrderFrom(Ag, Qtd)).
 	
 //comprobar si se necesita reponer
 +stock(beer,0) :  available(beer) & supermarket(Super) & precio(P) <-
 	.send(Super,untell,hayStock(P));
 	.send(Super,tell,hayStock(no));
 	-available(beer);
-	.println("Se necesita reponer.");
-	!save.
+	.println("Se necesita reponer.").
 	//!prepRestock.
-
 +stock(beer,N) :  N > 0 & not available(beer) <-
-	-+available(beer);
-	!save.
+	-+available(beer).
 
 //comprobar el num de cervezas que se pueden reponer con el precio de compra (P) que se le ha enviado
 +!prepRestock(P) : max_stock(beer,Max) & dinero(D) <-
@@ -67,13 +63,11 @@ available(beer).
 		.send(Super,untell,hayStock(no));
 		.send(Super,tell,hayStock(P));
 	}
-	-+stock(beer,X);
-	!save.
+	-+stock(beer,X).
 	
 +!cambiarDinero(Din) : supermarket(Super) <-
 	.send(Super,tell,dinero(Din));
-	-+dinero(Din);
-	!save.
+	-+dinero(Din).
 	
 +pagar(Pago) : dinero(D) & stock(beer,X) <- //recibir pago
 	Din=D+Pago;
@@ -82,5 +76,4 @@ available(beer).
 	//if (X == 0 & not available(beer)) {
 	//	!prepRestock;
 	//}
-	.abolish(pagar(_));
-	!save.
+	.abolish(pagar(_)).
