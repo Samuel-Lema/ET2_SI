@@ -85,8 +85,10 @@ public class MyHouseModel extends GridWorldModel {
 		
         setAgPos(0, r1); // move the robot in the grid
 
-		atOwner = r1.equals(closeTolOwner);
-		atFridge = r1.equals(closeTolFridge);
+		atOwner = r1.isInArea(aOwner);
+		atFridge = r1.isInArea(aFridge);
+		atTrashCan = r1.isInArea(aTrashCan);
+		atCan = r1.equals(lCan);
 		atDelivery = r1.equals(lDelivery);
 		atBase = r1.equals(lRobot);
 

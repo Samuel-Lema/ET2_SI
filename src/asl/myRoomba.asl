@@ -9,4 +9,4 @@
     !emptyTrashcan.
 
 
-+!emptyTrashcan <- !emptyTrashcan.
++!emptyTrashcan <- !emptyTrashcan. 

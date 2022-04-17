@@ -144,7 +144,8 @@ public class MyHouseEnv extends Environment {
                 dest = model.lTrashCan;
             } else if (l.equals("can")) {
                 dest = model.lCan;
-
+			}
+			
             try {
                 result = model.moveTowards(dest);
             } catch (Exception e) {
