@@ -50,7 +50,7 @@ public class MyHouseView extends GridWorldView {
 		case MyHouseModel.TRASHCAN:
 			super.drawAgent(g, x, y, Color.white, -1);
             g.setColor(Color.black);
-            drawString(g, x, y, defaultFont, "Trash (" + hmodel.trashCanCount + ")");
+            drawString(g, x, y, defaultFont, "Trash");
             break;
 		case MyHouseModel.CAN:
 			super.drawAgent(g, x, y, Color.white, -1);

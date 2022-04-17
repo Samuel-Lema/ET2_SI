@@ -71,7 +71,7 @@ state(5).
 		.println("el Owner ha bebido cerveza y aumenta un poco su estado de animo");
 	}
 	throw(beer);
-	.println("El owner ha tirado una lata");
+	.println("Owner tira una lata de cerveza.");
 	!drink(beer).
 +!drink(beer) : has(myOwner,beer) & not asked(beer) <-
 	sip(beer);
