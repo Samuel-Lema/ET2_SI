@@ -22,6 +22,15 @@ public class MyHouseEnv extends Environment {
     public static final Literal ao = Literal.parseLiteral("at(myRobot,myOwner)");
     public static final Literal ad = Literal.parseLiteral("at(myRobot,delivery)");
     public static final Literal ab = Literal.parseLiteral("at(myRobot,base)");
+	public static final Literal ac = Literal.parseLiteral("at(myRobot,can)");
+	public static final Literal at = Literal.parseLiteral("at(myRobot,trashCan)");
+
+	public static final Literal tb = Literal.parseLiteral("throw(beer)");
+	public static final Literal tf = Literal.parseLiteral("trashcan(full)");
+    public static final Literal et = Literal.parseLiteral("empty_trashcan(trash)");
+	public static final Literal caf = Literal.parseLiteral("canatfloor(can)");
+	public static final Literal puc = Literal.parseLiteral("pickup(can)");
+	public static final Literal ddc = Literal.parseLiteral("dropdown(can)");
 
     static Logger logger = Logger.getLogger(MyHouseEnv.class.getName());
 	
@@ -33,13 +42,10 @@ public class MyHouseEnv extends Environment {
     public void init(String[] args) {
         model = new MyHouseModel();
 		
-        //if (args.length > 1 && args[1].equals("gui")) {
         MyHouseView view  = new MyHouseView(model);                        
         model.setView(view);
-        //}
                                                                        
 		startCartago(args);
-
         updatePercepts();
     }
 	
@@ -67,11 +73,10 @@ public class MyHouseEnv extends Environment {
         Location lRobot = model.getAgPos(0);
 
         // add agent location to its percepts
-        //if (lRobot.equals(model.closeTolFridge)) {
 		if (model.atFridge) {
             addPercept("myRobot", af);
         }
-        //if (lRobot.equals(model.closeTolOwner)) {
+		
 		if (model.atOwner) {
             addPercept("myRobot", ao);
         }
@@ -83,6 +88,14 @@ public class MyHouseEnv extends Environment {
 		if (model.atBase) {
             addPercept("myRobot", ab);
         }
+		
+		if (model.atTrashCan) {
+            addPercept("myRobot", at);
+        }
+
+		if (model.atCan) {
+            addPercept("myRobot", ac);
+        }
 
         // add beer "status" the percepts
         if (model.fridgeOpen) {
@@ -93,6 +106,16 @@ public class MyHouseEnv extends Environment {
             addPercept("myRobot", hob);
             addPercept("myOwner", hob);
         }
+		
+		// add trash "status" the percepts
+
+		if(model.trashCanCount > 2){
+			addPercept("myRobot", tf);      
+	    }
+
+		if(model.trashThrowed > 0){
+			addPercept("myRobot", caf);      
+	    }
     }
 
 
@@ -117,7 +140,10 @@ public class MyHouseEnv extends Environment {
                 dest = model.lDelivery;
             } else if (l.equals("base")) {
                 dest = model.lRobot;
-            }
+            } else if (l.equals("trashCan")) {
+                dest = model.lTrashCan;
+            } else if (l.equals("can")) {
+                dest = model.lCan;
 
             try {
                 result = model.moveTowards(dest);
@@ -133,7 +159,19 @@ public class MyHouseEnv extends Environment {
 
         } else if (action.equals(sb) & ag.equals("myOwner")) {
             result = model.sipBeer();
+			
+		} else if (action.equals(tb) & ag.equals("myOwner")) {
+            result = model.throwBeer();
 
+        } else if (action.equals(et)){
+            result = model.emptyTrashCan();
+
+		} else if (action.equals(puc)){
+            result = model.pickUpCan();
+
+		} else if (action.equals(ddc)){
+            result = model.dropDownCan();
+			
         } else if (action.getFunctor().equals("deliver")) {
             // wait 4 seconds to finish "deliver"
             try {

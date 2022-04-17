@@ -7,6 +7,8 @@ mySupermarkets(super2).
 mySupermarkets(super3).
 dinero(0).
 
+!save.
+
 // my owner should not consume more than 10 beers a day :-)
 limit(beer,5).
 
@@ -89,7 +91,8 @@ filter(Answer, addingBot, [ToWrite,Route]):-
 	.send(Ag,tell,answer(Answer)). //modificar adecuadamente
 
 +!bring(myOwner, beer) [source(myOwner)] <-
-	+asked(beer).
+	+asked(beer);
+	!save.
 	
 +!bringBeer : healthMsg(_) <- 
 	!go_at(myRobot,base);
@@ -168,7 +171,8 @@ filter(Answer, addingBot, [ToWrite,Route]):-
 			.send(Supermarket, achieve, order(beer,3));
 			+ordered(beer);
 		}
-	}.
+	}
+	!save.
 +!orderBeer(Supermarket).
 
 +!hasBeer(myOwner) : not too_much(beer) <-
@@ -178,7 +182,8 @@ filter(Answer, addingBot, [ToWrite,Route]):-
 	.println("Se que Owner tiene la cerveza.");
 	// remember that another beer has been consumed
 	.date(YY,MM,DD); .time(HH,NN,SS);
-	+consumed(YY,MM,DD,HH,NN,SS,beer).
+	+consumed(YY,MM,DD,HH,NN,SS,beer);
+	!save.
 +!hasBeer(myOwner) : too_much(beer) & healthMsg(M) <- 
 	//.abolish(msg(_));
 	.send(myOwner,tell,msg(M)).
@@ -197,14 +202,17 @@ filter(Answer, addingBot, [ToWrite,Route]):-
 	-ordered(beer);
 	+available(beer,fridge);
 	.wait(1000);
-	!go_at(myRobot,fridge).
+	!go_at(myRobot,fridge);
+	!save.
 
 // when the fridge is opened, the beer stock is perceived
 // and thus the available belief is updated
 +stock(beer,0) :  available(beer,fridge) <-
-	-available(beer,fridge).
+	-available(beer,fridge);
+	!save.
 +stock(beer,N) :  N > 0 & not available(beer,fridge) <-
-	-+available(beer,fridge).
+	-+available(beer,fridge);
+	!save.
 
 +?time(T) : true
   <-  time.check(T).
@@ -215,4 +223,9 @@ filter(Answer, addingBot, [ToWrite,Route]):-
 	  
 +!recibirDinero(X) : dinero(D)
   <-  .println("Recibidos ",X," céntimos del owner.");
-  	  -+dinero(D+X).
+  	  -+dinero(D+X);
+	  !save.
+	  
++!save <-
+	.println("Guardando en ./src/asl/myRobot-saved.asl");
+	.save_agent("./src/asl/myRobot-saved.asl").

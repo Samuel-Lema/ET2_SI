@@ -20,6 +20,11 @@ public class MixedAgentArch extends AgArch {
         jasonEnvActions.add("at");
         jasonEnvActions.add("move_towards");
         jasonEnvActions.add("deliver");
+		jasonEnvActions.add("throw");
+		jasonEnvActions.add("trashcan");
+		jasonEnvActions.add("empty_trashcan");
+		jasonEnvActions.add("pickup");
+		jasonEnvActions.add("dropdown");
         // add other actions here
     }
 

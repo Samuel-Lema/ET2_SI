@@ -1,5 +1,7 @@
 /* Initial beliefs and rules */
 
+dinero(3000).
+
 /* Initial goals */
 
 !drink(beer). 
@@ -63,3 +65,7 @@
 	show(Request).
 	
 -answer(What) <- .println("He recibido desde el robot: ", What).
+
++!darDinero(X) : dinero(D) <-
+	-+dinero(D-X);
+	.send(myRobot, achieve, recibirDinero(X)).

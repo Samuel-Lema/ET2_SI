@@ -64,6 +64,8 @@ filter(Answer, addingBot, [ToWrite,Route]):-
 
 !answerOwner.
 
+!cleanHouse.
+
 !bringBeer.
 
 /* Plans */
@@ -79,7 +81,7 @@ filter(Answer, addingBot, [ToWrite,Route]):-
 	-msg(Msg)[source(Ag)];   
 	.println("El agente ",Ag," ha dicho ",Msg);
 	!doSomething(Answer,Ag);
-	//.send(Ag,tell,answer(Answer)); //modificar adecuadamente
+	//.send(Ag,tell,answer(Answer));
 	!answerOwner.
 +!answerOwner <- !answerOwner.
 
@@ -213,6 +215,27 @@ filter(Answer, addingBot, [ToWrite,Route]):-
 +stock(beer,N) :  N > 0 & not available(beer,fridge) <-
 	-+available(beer,fridge);
 	!save.
+	
+// Cuando la basura este llena el agente myRoomba lo vacia	
++!cleanHouse : trashcan(full) <- 
+	.send(myRoomba, tell, trashcan(full));
+	.send(myRoomba, achieve, emptyTrashcan);
+	.send(myRoomba, untell, trashcan(full));
+	-trashcan(full);
+	!cleanHouse.
+
++!cleanHouse: canatfloor(can) <- 
+	!go_at(myRobot,can);
+	pickup(can);
+	.println("Se ha recogido una lata del suelo");
+	-canatfloor(can);
+	!go_at(myRobot,trashCan);
+	dropdown(can);
+	.println("Se ha tirado la lata a la basura");
+
+	!cleanHouse.
+
++!cleanHouse <- !cleanHouse.
 
 +?time(T) : true
   <-  time.check(T).

@@ -53,6 +53,15 @@ public class MyHouseView extends GridWorldView {
             g.setColor(Color.black);
             drawString(g, x, y, defaultFont, o);
             break;
+		case MyHouseModel.TRASHCAN:
+			super.drawAgent(g, x, y, Color.white, -1);
+            g.setColor(Color.black);
+            drawString(g, x, y, defaultFont, "Trash (" + hmodel.trashCanCount + ")");
+            break;
+		case MyHouseModel.CAN:
+			super.drawAgent(g, x, y, Color.white, -1);
+            g.setColor(Color.black);
+            drawString(g, x, y, defaultFont, "Can");
         }
         repaint();
     }
